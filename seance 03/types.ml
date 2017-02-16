@@ -24,7 +24,7 @@ let rec dict_get k1 d =
   match d with
   | [] -> Nothing
   | (k2, v) :: tl ->
-    if k1 == k2
+    if String.equal k1 k2
     then Just v
     else dict_get k1 tl
   ;;

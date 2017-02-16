@@ -13,16 +13,21 @@ exception Eval_exn of string ;;
 let eval x ctx =
   match x with
   | Variable var ->
-    (maybe_to_string (maybe_map print_expression (dict_get var ctx))
-    , ctx)
-  | Function (var, body) ->
-    ("0", ctx)
-  | Application (left, right) ->
-    ("0", ctx)
-  | Assignation (Variable var, body) ->
-    (var, dict_put var body ctx)
+    (match dict_get var ctx with
+    | Nothing -> raise (Eval_exn ("undefined variable " ^ var))
+    | Just var_val -> print_string ((print_expression var_val) ^ "\n"));
+    
+    ctx
+
+  | Function (var, body) -> ctx
+
+  | Application (left, right) -> ctx
+
+  | Assignation (Variable var, body) -> (dict_put var body ctx)
+
   | _ ->
     raise (Eval_exn "")
+;;
 
 let rec loop ctx =
   try
@@ -30,18 +35,17 @@ let rec loop ctx =
 
     let expr = Parser.line Lexer.lexer ((Lexing.from_string (read_line () ^"\n"))) in
 
-    match (eval expr ctx) with
-    | (result, new_ctx) ->
-      print_string result;
-      print_string "\n";
-      print_string (dict_str (dict_map_values print_expression new_ctx)) ^ "\n";
-      loop new_ctx
+    let new_ctx = eval expr ctx in
+
+    print_string ((dict_str (dict_map_values print_expression new_ctx)) ^ "\n");
+
+    loop new_ctx
 
   with
   | End_of_file -> ()
   | Eval_exn msg ->
     print_string ("Error: " ^ msg ^ "\n");
-    ()
+    loop ctx
 ;;
 
 let _ = loop [] ;;
