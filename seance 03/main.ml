@@ -16,6 +16,13 @@ let evaldbg x =
 exception Eval_exn of string ;;
 
 let rec eval_application left right ctx =
+  let eval_expr e ctx =
+    match e with
+    | Variable vname -> maybe_get (dict_get vname ctx) (Eval_exn ("undefined variable " ^ vname))
+    | Application (left, right) -> eval_application left right ctx
+    | x -> x
+  in
+
   let rec aux pname pval body =
     match body with
     | Variable var ->
@@ -28,14 +35,15 @@ let rec eval_application left right ctx =
   in
 
   match left with
-  | Function (param, body) -> aux param right body
+  | Function (param, body) -> aux param (eval_expr right ctx) body
 
-  | Application (left2, right2) -> raise (Eval_exn "todo")
+  | Application (left2, right2) ->
+    let result = eval_application left2 right2 ctx in
+    eval_application result right ctx
 
   | Variable var ->
-    (match dict_get var ctx with
-    | Nothing -> raise (Eval_exn ("undefined function " ^ var))
-    | Just var_val -> eval_application var_val right ctx)
+    let var_val = (maybe_get (dict_get var ctx) (Eval_exn ("undefined function " ^ var))) in
+    eval_application var_val right ctx
 
   | _ -> raise (Eval_exn "invalid syntax")
 ;;
@@ -68,8 +76,8 @@ let rec loop ctx =
 
     let expr = Parser.line Lexer.lexer ((Lexing.from_string (read_line () ^"\n"))) in
 
-    (* let new_ctx = eval expr ctx in *)
-    let new_ctx = evaldbg expr in
+    let new_ctx = eval expr ctx in
+    (* let new_ctx = evaldbg expr in *)
 
     print_string ((dict_str (dict_map_values print_expression new_ctx)) ^ "\n");
 
