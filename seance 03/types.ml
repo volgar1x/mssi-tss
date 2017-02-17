@@ -1,5 +1,5 @@
 type expression = Variable of string
-                | Function of expression * expression
+                | Function of string * expression
                 | Application of expression * expression
                 | Assignation of expression * expression
                 ;;
@@ -17,6 +17,12 @@ let maybe_fmap fn x =
   | Nothing -> Nothing
 
 let maybe_map fn x = maybe_fmap (fun x -> Just (fn x)) x
+
+let maybe_get x err =
+  match x with
+  | Nothing -> raise err
+  | Just y -> y
+;;
 
 type ('k, 'v) dictionary = 'k * 'v list ;;
 
