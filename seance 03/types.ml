@@ -1,10 +1,12 @@
+type 't maybe = Just of 't | Nothing ;;
+
+type ('k, 'v) dictionary = 'k * 'v list ;;
+
 type expression = Variable of string
-                | Function of string * expression
+                | Function of string * expression * ((string * expression) list)
                 | Application of expression * expression
                 | Assignation of expression * expression
                 ;;
-
-type 't maybe = Just of 't | Nothing ;;
 
 let maybe_to_string = function
   | Just x -> "Just(" ^ x ^ ")"
@@ -24,8 +26,6 @@ let maybe_get x err =
   | Just y -> y
 ;;
 
-type ('k, 'v) dictionary = 'k * 'v list ;;
-
 let rec dict_get k1 d =
   match d with
   | [] -> Nothing
@@ -35,7 +35,18 @@ let rec dict_get k1 d =
     else dict_get k1 tl
   ;;
 
-let dict_put k v d = (k, v) :: d
+let dict_put k1 v1 d =
+  let rec aux xs acc =
+    match xs with
+    | [] -> (k1, v1) :: acc
+    | (k2, v2) :: tl ->
+      if String.equal k1 k2
+      then aux tl acc
+      else aux tl ((k2, v2) :: acc)
+  in
+
+  aux d []
+  ;;
 
 let dict_str xs =
   let rec aux xs acc =
@@ -58,3 +69,12 @@ let dict_map_values fn xs =
 
   aux xs []
 ;;
+
+let dict_merge a b =
+  let rec aux xs acc =
+    match xs with
+    | [] -> acc
+    | (k, v) :: tl -> aux tl (dict_put k v acc)
+  in
+  aux b a
+  ;;
