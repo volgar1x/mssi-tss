@@ -1,0 +1,4 @@
+let id = lambda x. x
+let and = lambda l. lambda r. if l then if r then true else false else false
+let or  = lambda l. lambda r. if l then true else if r then true else false
+let xor = lambda l. lambda r. if l then (if r then false else true) else (if r then true else false)
