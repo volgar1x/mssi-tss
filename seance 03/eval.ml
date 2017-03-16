@@ -14,6 +14,19 @@ let rec eval_expr expr ctx =
     let new_ctx = dict_merge ctx inner_ctx in
     Function (paramname, body, new_ctx)
 
+  | Application (Variable "pred", Application (Variable "succ", e)) -> e
+  | Application (Variable "succ", Application (Variable "pred", e)) -> e
+
+  | Application (Variable "succ", paramexpr) ->
+    (match eval_expr paramexpr ctx with
+    | Natural nat -> Natural (nat + 1)
+    | _ -> raise (Eval_exn ("succ function is applicable only to naturals")))
+
+  | Application (Variable "pred", paramexpr) ->
+    (match eval_expr paramexpr ctx with
+    | Natural nat -> Natural (nat - 1)
+    | _ -> raise (Eval_exn ("succ function is applicable only to naturals")))
+
   | Application (fnexpr, paramexpr) ->
     let paramresult = eval_expr paramexpr ctx in
 
