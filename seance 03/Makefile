@@ -43,4 +43,4 @@ main.cmo:main.ml
 	$(OCAMLC) -c main.ml
 
 clean:
-	rm -f types.cmo lexer.cmo parser.cmo eval.cmo main.cmo types.cmi lexer.cmi parser.cmi eval.cmi main.cmi parser.mli parser.ml lexer.ml dict.cmi dict.cmo maybe.cmi maybe.cmo eval.cmi eval.cmo
+	rm -f appli types.cmo lexer.cmo parser.cmo eval.cmo main.cmo types.cmi lexer.cmi parser.cmi eval.cmi main.cmi parser.mli parser.ml lexer.ml dict.cmi dict.cmo maybe.cmi maybe.cmo eval.cmi eval.cmo
