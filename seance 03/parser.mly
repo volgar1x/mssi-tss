@@ -10,6 +10,7 @@
 %token Llet
 %token Leq
 %token <string> Lident
+%token <string> Linteger
 
 %start line
 %type <Types.expression> line
@@ -24,6 +25,7 @@ expr :
      | Llet expr Leq expr          {Assignation ($2, $4)}
      | Llambda Lident Ldot expr    {Function ($2, $4, [])}
      | Lident                      {Variable ($1)}
+     | Linteger                    {Natural (int_of_string $1)}
      | expr2 expr                  {Application ($1, $2)}
 
 expr2 : expr {$1}

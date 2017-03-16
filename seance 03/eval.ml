@@ -4,12 +4,6 @@ open Maybe ;;
 
 exception Eval_exn of string ;;
 
-let isval expr =
-  match expr with
-  | Function (_, _, _) -> true
-  | _ -> false
-;;
-
 let rec eval_expr expr ctx =
   match expr with
 
@@ -23,14 +17,15 @@ let rec eval_expr expr ctx =
   | Application (fnexpr, paramexpr) ->
     let paramresult = eval_expr paramexpr ctx in
 
-    match eval_expr fnexpr ctx with
+    (match eval_expr fnexpr ctx with
     | Function (paramname, body, inner_ctx) ->
       let eval_ctx = dict_put paramname paramresult inner_ctx in
       eval_expr body eval_ctx
-    | _ -> raise (Eval_exn "")
+    | _ -> raise (Eval_exn ""))
 
-  | _ ->
-    raise (Eval_exn "TODO")
+  | Natural _ -> expr
+
+  | Assignation (_, _) -> raise (Eval_exn "assignation is not allowed here")
 
   ;;
 
