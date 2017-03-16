@@ -54,3 +54,5 @@ let dict_merge a b =
   in
   aux b a
   ;;
+
+print_string ("dict_merge: " ^ (dict_str (dict_merge (dict_put "a" "hello" []) (dict_put "a" "world" []))) ^ "\n") ;;

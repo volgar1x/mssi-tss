@@ -4,7 +4,7 @@ OCAMLDEP=ocamldep
 OCAMLLEX=ocamllex
 OCAMLYACC=ocamlyacc
 
-APPLI_OBJS=maybe.cmo dict.cmo types.cmo lexer.cmo parser.cmo main.cmo
+APPLI_OBJS=maybe.cmo dict.cmo types.cmo lexer.cmo parser.cmo eval.cmo main.cmo
 
 appli:$(APPLI_OBJS)
 	$(OCAMLC) -o appli $(APPLI_OBJS)
@@ -14,6 +14,9 @@ maybe.cmo:maybe.ml
 
 dict.cmo:dict.ml
 	$(OCAMLC) -c dict.ml
+
+eval.cmo:eval.ml
+	$(OCAMLC) -c eval.ml
 
 types.cmo:types.ml
 	$(OCAMLC) -c types.ml
@@ -40,4 +43,4 @@ main.cmo:main.ml
 	$(OCAMLC) -c main.ml
 
 clean:
-	rm -f types.cmo lexer.cmo parser.cmo eval.cmo main.cmo types.cmi lexer.cmi parser.cmi eval.cmi main.cmi parser.mli parser.ml lexer.ml dict.cmi dict.cmo maybe.cmi maybe.cmo
+	rm -f types.cmo lexer.cmo parser.cmo eval.cmo main.cmo types.cmi lexer.cmi parser.cmi eval.cmi main.cmi parser.mli parser.ml lexer.ml dict.cmi dict.cmo maybe.cmi maybe.cmo eval.cmi eval.cmo
