@@ -11,6 +11,8 @@
 %token Leq
 %token <string> Lident
 %token <string> Linteger
+%token Ltrue
+%token Lfalse
 
 %start line
 %type <Types.expression> line
@@ -26,6 +28,8 @@ expr :
      | Llambda Lident Ldot expr    {Function ($2, $4, [])}
      | Lident                      {Variable ($1)}
      | Linteger                    {Natural (int_of_string $1)}
+     | Ltrue                       {Boolean true}
+     | Lfalse                      {Boolean false}
      | expr2 expr                  {Application ($1, $2)}
 
 expr2 : expr {$1}

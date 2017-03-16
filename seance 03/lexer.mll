@@ -13,5 +13,7 @@ rule lexer = parse
   | "."                                                 {Ldot}
   | "let"                                               {Llet}
   | "="                                                 {Leq}
+  | "true"                                              {Ltrue}
+  | "false"                                             {Lfalse}
   | ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9']*        {Lident (Lexing.lexeme lexbuf)}
   | ['0'-'9']+                                          {Linteger (Lexing.lexeme lexbuf)}

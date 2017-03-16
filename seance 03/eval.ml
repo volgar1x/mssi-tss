@@ -24,6 +24,7 @@ let rec eval_expr expr ctx =
     | _ -> raise (Eval_exn ""))
 
   | Natural _ -> expr
+  | Boolean _ -> expr
 
   | Assignation (_, _) -> raise (Eval_exn "assignation is not allowed here")
 

@@ -5,6 +5,7 @@ type expression = Variable of string
                 | Application of expression * expression
                 | Assignation of expression * expression
                 | Natural of int
+                | Boolean of bool
                 ;;
 
 
@@ -15,6 +16,7 @@ let rec print_expression x =
   | Application (left, right) -> "Application(" ^ (print_expression left) ^ ", " ^ (print_expression right) ^ ")"
   | Assignation (var, body) -> "Assignation(" ^ (print_expression var) ^  ", " ^ (print_expression body) ^ ")"
   | Natural nat -> "Natural(" ^ (string_of_int nat) ^ ")"
+  | Boolean b -> "Boolean(" ^ (if b then "true" else "false") ^ ")"
   ;;
 
 let ctx_str ctx = dict_str (dict_map_values print_expression ctx) ;;
