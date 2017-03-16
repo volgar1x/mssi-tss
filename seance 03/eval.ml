@@ -23,6 +23,12 @@ let rec eval_expr expr ctx =
       eval_expr body eval_ctx
     | _ -> raise (Eval_exn ""))
 
+  | Cond (cond, body, els) ->
+    (match eval_expr cond ctx with
+    | Boolean true -> eval_expr body ctx
+    | Boolean false -> eval_expr els ctx
+    | other -> raise (Eval_exn ("cannot branch on expression " ^ (print_expression other))))
+
   | Natural _ -> expr
   | Boolean _ -> expr
 
