@@ -1,4 +1,6 @@
 open Types ;;
+open Dict ;;
+open Maybe ;;
 
 let rec print_expression x =
   match x with
