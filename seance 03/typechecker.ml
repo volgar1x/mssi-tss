@@ -13,13 +13,20 @@ let etype_is_assignable_to fromT toT =
     | _ -> etype_equal fromT toT)
 ;;
 
+let etype_assert_assignable_to fromT toT =
+  if etype_is_assignable_to fromT toT
+  then ()
+  else raise (Type_exn ("cannot apply " ^ (etype_print fromT) ^ " to " ^ (etype_print toT)))
+;;
+
 let etype_apply t a = match t with
-  | TParameter b ->
+  | TParameter b -> (* just assume its a function for now *)
     TParameter (b ^ "2")
+
   | TFunction (b, c) ->
-    if etype_is_assignable_to a b
-    then c
-    else raise (Type_exn ("cannot apply " ^ (etype_print a) ^ " to " ^ (etype_print t)))
+    etype_assert_assignable_to a b;
+    c
+    
   | _ -> raise (Type_exn ("type " ^ (etype_print t) ^ " is not applicable"))
 ;;
 
@@ -53,6 +60,11 @@ let rec type_of_expression gamma expr = match expr with
   | Application (left, right) ->
     let leftT = type_of_expression gamma left in
     let rightT = type_of_expression gamma right in
+
+    (match leftT with
+    | TFunction _ | TParameter _ -> ()
+    | _ -> raise (Type_exn ("cannot apply " ^ (etype_print rightT) ^ " to " ^ (etype_print leftT))));
+
     etype_apply leftT rightT
   | Function (param, body, _) ->
     let paramT = TParameter "T" in
