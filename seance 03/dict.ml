@@ -46,6 +46,16 @@ let dict_map_values fn xs =
   aux xs []
 ;;
 
+let dict_keys xs =
+  let rec aux xs acc =
+    match xs with
+    | [] -> acc
+    | (k, _) :: tl -> aux tl (k::acc)
+  in
+
+  aux xs []
+;;
+
 let dict_merge a b =
   let rec aux xs acc =
     match xs with

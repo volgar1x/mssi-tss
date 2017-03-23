@@ -11,10 +11,22 @@ type expression = Variable of string
                 ;;
 
 
+type etype = TBoolean
+           | TNatural
+           | TFunction of etype * etype
+           | TParameter of string
+           ;;
+
+let print_ctx_keys xs =
+  "[" ^
+  (String.concat ", " (dict_keys xs)) ^
+  "]"
+;;
+
 let rec print_expression x =
   match x with
   | Variable var -> "Variable(" ^ var ^ ")"
-  | Function (var, body, bound_ctx) -> "Function(" ^ var ^  ", " ^ (print_expression body) ^ ", " ^ (dict_str (dict_map_values print_expression bound_ctx)) ^ ")"
+  | Function (var, body, bound_ctx) -> "Function(" ^ var ^  ", " ^ (print_expression body) ^ ", " ^ (print_ctx_keys bound_ctx) ^ ")"
   | Application (left, right) -> "Application(" ^ (print_expression left) ^ ", " ^ (print_expression right) ^ ")"
   | Assignation (var, body) -> "Assignation(" ^ (print_expression var) ^  ", " ^ (print_expression body) ^ ")"
   | Natural nat -> "Natural(" ^ (string_of_int nat) ^ ")"
@@ -25,6 +37,23 @@ let rec print_expression x =
 
 let ctx_str ctx = dict_str (dict_map_values print_expression ctx) ;;
 
+let rec etype_print = function
+  | TBoolean -> "TBoolean"
+  | TNatural -> "TNatural"
+  | TFunction (a, b) ->
+    (match a with
+    | TFunction (_, _) -> "(" ^ (etype_print a) ^ ") -> " ^ (etype_print b)
+    | _ -> (etype_print a) ^ " -> " ^ (etype_print b))
+  | TParameter t -> "[" ^ t ^ "]"
+;;
+
+let rec etype_equal left right = match (left, right) with
+  | (TBoolean, TBoolean) -> true
+  | (TNatural, TNatural) -> true
+  | (TParameter a, TParameter b) -> String.equal a b
+  | (TFunction (a, b), TFunction (c, d)) -> (etype_equal a c) && (etype_equal b d)
+  | _ -> false
+;;
 
 let debug_expression x =
   print_string ((print_expression x) ^ "\n")
@@ -32,4 +61,8 @@ let debug_expression x =
 
 let debug_ctx ctx =
   print_string ((ctx_str ctx) ^ "\n")
+;;
+
+let debug_gamma g =
+  print_string ((dict_str (dict_map_values etype_print g)) ^ "\n")
 ;;
