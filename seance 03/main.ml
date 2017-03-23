@@ -3,10 +3,6 @@ open Dict ;;
 open Eval ;;
 open Stdlib ;;
 
-let debug_expression x =
-  print_string ((print_expression x) ^ "\n")
-;;
-
 let rec loop ctx =
   try
     print_string ">>> ";
@@ -15,8 +11,7 @@ let rec loop ctx =
 
     (* debug_expression expr; *)
     let new_ctx = eval expr ctx in
-
-    (* print_string ((dict_str (dict_map_values print_expression new_ctx)) ^ "\n"); *)
+    (* debug_ctx new_ctx; *)
 
     loop new_ctx
 

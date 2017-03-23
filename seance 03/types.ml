@@ -24,3 +24,12 @@ let rec print_expression x =
   ;;
 
 let ctx_str ctx = dict_str (dict_map_values print_expression ctx) ;;
+
+
+let debug_expression x =
+  print_string ((print_expression x) ^ "\n")
+;;
+
+let debug_ctx ctx =
+  print_string ((ctx_str ctx) ^ "\n")
+;;
