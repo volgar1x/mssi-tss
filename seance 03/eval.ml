@@ -14,8 +14,8 @@ let rec eval_expr expr ctx =
     let new_ctx = dict_merge ctx inner_ctx in
     Function (paramname, body, new_ctx)
 
-  | Application (Variable "pred", Application (Variable "succ", e)) -> e
-  | Application (Variable "succ", Application (Variable "pred", e)) -> e
+  | Application (Variable "pred", Application (Variable "succ", e)) -> eval_expr e ctx
+  | Application (Variable "succ", Application (Variable "pred", e)) -> eval_expr e ctx
 
   | Application (Variable "succ", paramexpr) ->
     (match eval_expr paramexpr ctx with
@@ -41,6 +41,11 @@ let rec eval_expr expr ctx =
     | Boolean true -> eval_expr body ctx
     | Boolean false -> eval_expr els ctx
     | other -> raise (Eval_exn ("cannot branch on expression " ^ (print_expression other))))
+
+  | Bind (varname, varexpr, body) ->
+    let varresult = eval_expr varexpr ctx in
+    let new_ctx = dict_put varname varresult ctx in
+    eval_expr body new_ctx
 
   | Natural _ -> expr
   | Boolean _ -> expr

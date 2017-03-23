@@ -7,6 +7,7 @@ type expression = Variable of string
                 | Natural of int
                 | Boolean of bool
                 | Cond of expression * expression * expression
+                | Bind of string * expression * expression
                 ;;
 
 
@@ -19,6 +20,7 @@ let rec print_expression x =
   | Natural nat -> "Natural(" ^ (string_of_int nat) ^ ")"
   | Boolean b -> "Boolean(" ^ (if b then "true" else "false") ^ ")"
   | Cond (cond, body, els) -> "Cond(" ^ (print_expression cond) ^ "," ^ (print_expression body) ^ "," ^ (print_expression els) ^ ")"
+  | Bind (varname, varexpr, body) -> "Bind(" ^ varname ^ "," ^ (print_expression varexpr) ^ "," ^ (print_expression body) ^ ")"
   ;;
 
 let ctx_str ctx = dict_str (dict_map_values print_expression ctx) ;;
