@@ -1,52 +1,40 @@
+.PHONY: run _run build clean
+
+TARGET=appli
 OCAMLC=ocamlc
 OCAMLOPT=ocamlopt
 OCAMLDEP=ocamldep
 OCAMLLEX=ocamllex
 OCAMLYACC=ocamlyacc
 
-APPLI_OBJS=maybe.cmo dict.cmo types.cmo lexer.cmo parser.cmo eval.cmo stdlib.cmo typechecker.cmo main.cmo
+APPLI_OBJS=maybe.cmo dict.cmo types.cmo parser.cmo lexer.cmo eval.cmo stdlib.cmo typechecker.cmo main.cmo
 
-appli:$(APPLI_OBJS)
-	$(OCAMLC) -o appli $(APPLI_OBJS)
+$(TARGET): build
 
-maybe.cmo:maybe.ml
-	$(OCAMLC) -c maybe.ml
+parser.cmo: parser.ml parser.cmi
+parser.ml: parser.mly
+	$(OCAMLYACC) $<
 
-dict.cmo:dict.ml
-	$(OCAMLC) -c dict.ml
+lexer.ml: lexer.mll
+	$(OCAMLLEX) $<
 
-eval.cmo:eval.ml
-	$(OCAMLC) -c eval.ml
+%.cmo: %.ml
+	$(OCAMLC) -c $<
 
-stdlib.cmo:stdlib.ml
-	$(OCAMLC) -c stdlib.ml
+%.cmi: %.mli
+	$(OCAMLC) -c $<
 
-types.cmo:types.ml
-	$(OCAMLC) -c types.ml
+run: build _run clean
 
-typechecker.cmo:typechecker.ml
-	$(OCAMLC) -c typechecker.ml
-
-parser.ml:parser.mly
-	$(OCAMLYACC) parser.mly
-
-parser.mli:parser.mly
-	$(OCAMLYACC) parser.mly
-
-parser.cmi:parser.mli
-	$(OCAMLC) -c parser.mli
-
-parser.cmo:parser.ml
-	$(OCAMLC) -c parser.ml
-
-lexer.ml:lexer.mll
-	$(OCAMLLEX) lexer.mll
-
-lexer.cmo:lexer.ml parser.cmi
-	$(OCAMLC) -c lexer.ml
-
-main.cmo:main.ml
-	$(OCAMLC) -c main.ml
+build:$(APPLI_OBJS)
+	$(OCAMLC) -o $(TARGET) $(APPLI_OBJS)
 
 clean:
-	rm -f appli types.cmo lexer.cmo parser.cmo eval.cmo main.cmo types.cmi lexer.cmi parser.cmi eval.cmi main.cmi parser.mli parser.ml lexer.ml dict.cmi dict.cmo maybe.cmi maybe.cmo eval.cmi eval.cmo stdlib.cmi stdlib.cmo typechecker.cmi typechecker.cmo
+	rm -f $(TARGET) \
+		$(APPLI_OBJS) \
+		$(APPLI_OBJS:.cmo=.cmi) \
+		parser.ml parser.mi \
+		lexer.ml
+
+_run:
+	./appli
