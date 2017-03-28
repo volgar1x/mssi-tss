@@ -26,7 +26,7 @@
 %%
 
 line :
-     | expr Leol                           {$1}
+     | expr Lend                           {$1}
 ;
 
 atom :
@@ -38,15 +38,16 @@ atom :
 
 expr :
      | Loparen expr Lcparen                {$2}
+     | expr Loparen expr Lcparen           {Application ($1, $3)}
      | expr atom                           {Application ($1, $2)}
      | Llambda Lident Ldot expr            {Function ($2, $4, [])}
      | Lif expr Lthen expr Lelse expr      {Cond ($2, $4, $6)}
-     | Llet Lident Leq expr Lin expr       {Bind ($2, $4, $6)}
+     | Llet Lident Leq expr finish_let     {Bind ($2, $4, $5)}
      | atom                                {$1}
 ;
 
 finish_let :
-  | Lend     {Unit}
+  |          {Unit}
   | Lin expr {$2}
 ;
 

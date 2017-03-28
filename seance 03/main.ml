@@ -6,8 +6,18 @@ open Stdlib ;;
 open Typechecker ;;
 
 let rec loop ctx =
+  let parse buf =
+    try
+      Parser.line Lexer.lexer buf
+    with
+    | Parsing.Parse_error ->
+      raise (Eval_exn ("Parse Error on column " ^ (string_of_int buf.lex_curr_pos) ^ " `" ^ (Lexing.lexeme buf) ^ "'"))
+    | Failure reason ->
+      raise (Eval_exn ("Parse Error on column " ^ (string_of_int buf.lex_curr_pos) ^ " `" ^ (Lexing.lexeme buf) ^ "' because: " ^ reason))
+  in
+
   let eval_print line =
-    let expr = Parser.line Lexer.lexer (Lexing.from_string (line ^ "\n")) in
+    let expr = parse (Lexing.from_string line) in
 
     (* debug_expression expr; *)
     let exprT = type_of_expression (type_of_context ctx) expr in  
@@ -38,6 +48,7 @@ let rec loop ctx =
     loop ctx
 ;;
 
-let stdlib = load_stdlib () ;;
-debug_gamma (type_of_context stdlib) ;;
-let _ = loop stdlib ;;
+let stdlib = load_stdlib () in
+debug_gamma (type_of_context stdlib);
+loop stdlib
+;;

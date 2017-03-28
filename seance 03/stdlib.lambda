@@ -1,16 +1,16 @@
 let id = lambda x. x ;;
 
-let and = lambda l. lambda r. if l then if r then true else false else false
-let or  = lambda l. lambda r. if l then true else if r then true else false
-let xor = lambda l. lambda r. if l then (if r then false else true) else (if r then true else false)
+let and = lambda l. lambda r. if l then if r then true else false else false ;;
+let or  = lambda l. lambda r. if l then true else if r then true else false ;;
+let xor = lambda l. lambda r. if l then (if r then false else true) else (if r then true else false) ;;
 
-let nil = lambda c. lambda n. n
-let cons = lambda h. lambda t. lambda c. lambda n. (c h (t c n))
-let head = lambda l. (l (lambda h. lambda t. h) false)
-let tail = lambda l. (l (lambda h. lambda l. l) nil)
-let isnil = lambda l. (l (lambda h. lambda l. false) true)
-let len = lambda l. (l (lambda i. (succ i)) 0)
+let nil = lambda c. lambda n. n ;;
+let cons = lambda h. lambda t. lambda c. lambda n. (c h (t c n)) ;;
+let head = lambda l. (l (lambda h. lambda t. h) false) ;;
+let tail = lambda l. (l (lambda h. lambda l. l) nil) ;;
+let isnil = lambda l. (l (lambda h. lambda l. false) true) ;;
+let len = lambda l. (l (lambda i. (succ i)) 0) ;;
 
-let tru = lambda t. lambda f. t
-let fls = lambda t. lambda f. f
+let tru = lambda t. lambda f. t ;;
+let fls = lambda t. lambda f. f ;;
 

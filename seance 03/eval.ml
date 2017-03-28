@@ -46,6 +46,11 @@ let rec eval expr ctx =
     | (Boolean false, new_ctx) -> eval els new_ctx
     | (other, _) -> raise (Eval_exn ("cannot branch on expression " ^ (print_expression other))))
 
+  | Bind (varname, varexpr, Unit) ->
+    let (varresult, _) = eval varexpr ctx in
+    let new_ctx = dict_put varname varresult ctx in
+    (varresult, new_ctx)
+
   | Bind (varname, varexpr, body) ->
     let (varresult, _) = eval varexpr ctx in
     let new_ctx = dict_put varname varresult ctx in
