@@ -40,6 +40,7 @@ let rec etype_apply t a =
 let rec type_of_expression gamma expr = match expr with
   | Natural _ -> TNatural
   | Boolean _ -> TBoolean
+  | Unit -> TUnit
   | Variable "succ" -> TFunction (TNatural, TNatural)
   | Variable "pred" -> TFunction (TNatural, TNatural)
   | Variable varname ->

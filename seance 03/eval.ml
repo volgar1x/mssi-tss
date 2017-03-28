@@ -53,6 +53,7 @@ let rec eval expr ctx =
 
   | Natural _ -> (expr, ctx)
   | Boolean _ -> (expr, ctx)
+  | Unit -> (Unit, ctx)
 
   | Assignation (Variable varname, varexpr) ->
     let (varresult, _) = eval varexpr ctx in
