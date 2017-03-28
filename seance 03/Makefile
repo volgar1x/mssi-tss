@@ -1,4 +1,4 @@
-.PHONY: run _run build clean
+.PHONY: run build clean
 
 TARGET=appli
 OCAMLC=ocamlc
@@ -11,6 +11,7 @@ APPLI_OBJS=maybe.cmo dict.cmo types.cmo parser.cmo lexer.cmo eval.cmo stdlib.cmo
 
 $(TARGET): build
 
+parser.cmi: parser.mli
 parser.cmo: parser.ml parser.cmi
 parser.ml: parser.mly
 	$(OCAMLYACC) $<
@@ -24,7 +25,8 @@ lexer.ml: lexer.mll
 %.cmi: %.mli
 	$(OCAMLC) -c $<
 
-run: build _run clean
+run:
+	make build && ./$(TARGET); make clean
 
 build:$(APPLI_OBJS)
 	$(OCAMLC) -o $(TARGET) $(APPLI_OBJS)
@@ -33,8 +35,5 @@ clean:
 	rm -f $(TARGET) \
 		$(APPLI_OBJS) \
 		$(APPLI_OBJS:.cmo=.cmi) \
-		parser.ml parser.mi \
+		parser.ml parser.mli \
 		lexer.ml
-
-_run:
-	./appli
