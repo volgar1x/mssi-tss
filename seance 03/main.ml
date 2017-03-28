@@ -13,7 +13,9 @@ let rec loop ctx =
     let exprT = type_of_expression (type_of_context ctx) expr in  
     print_endline ("=> " ^ (etype_print exprT));
     
-    eval expr ctx
+    let (result, new_ctx) = eval expr ctx in
+    print_endline (print_expression result);
+    new_ctx
   in
 
   try
