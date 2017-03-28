@@ -1,12 +1,16 @@
 global id = lambda x. x
+
 global and = lambda l. lambda r. if l then if r then true else false else false
 global or  = lambda l. lambda r. if l then true else if r then true else false
 global xor = lambda l. lambda r. if l then (if r then false else true) else (if r then true else false)
+
 global nil = lambda c. lambda n. n
 global cons = lambda h. lambda t. lambda c. lambda n. (c h (t c n))
 global head = lambda l. (l (lambda h. lambda t. h) false)
 global tail = lambda l. (l (lambda h. lambda l. l) nil)
 global isnil = lambda l. (l (lambda h. lambda l. false) true)
 global len = lambda l. (l (lambda i. (succ i)) 0)
+
 global tru = lambda t. lambda f. t
 global fls = lambda t. lambda f. f
+
