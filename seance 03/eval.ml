@@ -60,9 +60,4 @@ let rec eval expr ctx =
   | Boolean _ -> (expr, ctx)
   | Unit -> (Unit, ctx)
 
-  | Assignation (Variable varname, varexpr) ->
-    let (varresult, _) = eval varexpr ctx in
-    let new_ctx = dict_put varname varresult ctx in
-    (varresult, new_ctx)
-
   ;;

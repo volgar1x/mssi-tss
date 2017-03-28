@@ -4,6 +4,13 @@ open Maybe ;;
 
 exception Type_exn of string ;;
 
+type type_context = {
+  next_param : string;
+  context    : (string * etype) list;
+};;
+
+let next_param param = Char.escaped (Char.chr ((Char.code param.[0]) + 1)) ;;
+
 let rec etype_is_assignable_to fromT toT =
   match toT with
   | TName _ -> true
@@ -38,19 +45,22 @@ let rec etype_apply t a =
 ;;
 
 let rec type_of_expression gamma expr = match expr with
+  | Variable "succ" -> TFunction (TNatural, TNatural)
+  | Variable "pred" -> TFunction (TNatural, TNatural)
   | Natural _ -> TNatural
   | Boolean _ -> TBoolean
   | Unit -> TUnit
-  | Variable "succ" -> TFunction (TNatural, TNatural)
-  | Variable "pred" -> TFunction (TNatural, TNatural)
+
   | Variable varname ->
-    (match dict_get varname gamma with
-    | Nothing -> TName varname
+    (match dict_get varname gamma.context with
+    | Nothing -> TName varname (* TODO *)
     | Just t -> t)
+
   | Bind (varname, varexpr, body) ->
     let vartype = type_of_expression gamma varexpr in
-    let new_gamma = dict_put varname vartype gamma in
-    type_of_expression new_gamma body
+    let new_gamma = dict_put varname vartype gamma.context in
+    type_of_expression { next_param = gamma.next_param; context = new_gamma } body
+
   | Cond (cond, body, els) ->
     let condtype = type_of_expression gamma cond in
     etype_assert_assignable_to TBoolean condtype;
@@ -66,19 +76,20 @@ let rec type_of_expression gamma expr = match expr with
     let leftT = type_of_expression gamma left in
     let rightT = type_of_expression gamma right in
     etype_apply leftT rightT
-  | Function (param, body, _) ->
-    let paramT = TName "T" in
-    let new_gamma = dict_put param paramT gamma in
-    let bodyT = type_of_expression new_gamma body in
-    TForAll ("T", TFunction (paramT, bodyT))
-  | _ -> raise (Type_exn ("unknown type mismatch: " ^ (print_expression expr)))
+
+  | Function (paramname, body, _) ->
+    let param = gamma.next_param in
+    let paramT = TName param in
+    let new_gamma = dict_put paramname paramT gamma.context in
+    let bodyT = type_of_expression { next_param = next_param param; context = new_gamma } body in
+    TForAll (param, TFunction (paramT, bodyT))
 ;;
 
 let type_of_context ctx =
   let rec aux xs acc = match xs with
-  | [] -> acc
+  | [] -> { next_param = "T"; context = acc }
   | (k, v) :: tl ->
-    let v2 = type_of_expression acc v in
+    let v2 = type_of_expression { next_param = "T"; context = acc } v in
     aux tl ((k, v2) :: acc)
   in
 

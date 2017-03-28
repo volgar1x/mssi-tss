@@ -4,6 +4,7 @@ open Maybe ;;
 open Eval ;;
 open Stdlib ;;
 open Typechecker ;;
+open Lexing ;;
 
 let rec loop ctx =
   let parse buf =
@@ -49,6 +50,6 @@ let rec loop ctx =
 ;;
 
 let stdlib = load_stdlib () in
-debug_gamma (type_of_context stdlib);
+debug_gamma (type_of_context stdlib).context;
 loop stdlib
 ;;
