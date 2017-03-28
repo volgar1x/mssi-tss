@@ -4,24 +4,31 @@ open Maybe ;;
 
 exception Type_exn of string ;;
 
-let etype_is_assignable_to fromT toT =
+let rec etype_is_assignable_to fromT toT =
   match toT with
-  | TParameter _ -> true
+  | TName _ -> true
+  | TForAll (_, e) -> etype_is_assignable_to fromT e
   | _ ->
     (match fromT with
-    | TParameter _ -> true (* TODO *)
+    | TName _ -> true (* TODO *)
+    | TForAll (_, e) -> etype_is_assignable_to e toT
     | _ -> etype_equal fromT toT)
 ;;
 
 let etype_assert_assignable_to fromT toT =
   if etype_is_assignable_to fromT toT
   then ()
-  else raise (Type_exn ("cannot apply " ^ (etype_print fromT) ^ " to " ^ (etype_print toT)))
+  else raise (Type_exn ("cannot assign " ^ (etype_print fromT) ^ " to " ^ (etype_print toT)))
 ;;
 
-let etype_apply t a = match t with
-  | TParameter b -> (* just assume its a function for now *)
-    TParameter (b ^ "2")
+let rec etype_apply t a =
+  match t with
+  | TName b -> (* just assume its a function for now *)
+    TName (b ^ "2")
+
+  | TForAll (n, b) ->
+    let tt = etype_replace b n a in
+    etype_apply tt a
 
   | TFunction (b, c) ->
     etype_assert_assignable_to a b;
@@ -37,7 +44,7 @@ let rec type_of_expression gamma expr = match expr with
   | Variable "pred" -> TFunction (TNatural, TNatural)
   | Variable varname ->
     (match dict_get varname gamma with
-    | Nothing -> TParameter varname
+    | Nothing -> TName varname
     | Just t -> t)
   | Bind (varname, varexpr, body) ->
     let vartype = type_of_expression gamma varexpr in
@@ -45,10 +52,7 @@ let rec type_of_expression gamma expr = match expr with
     type_of_expression new_gamma body
   | Cond (cond, body, els) ->
     let condtype = type_of_expression gamma cond in
-
-    (match condtype with
-    | TBoolean | TParameter _ -> ()
-    | _ -> raise (Type_exn ("only boolean are available in conditions but got: " ^ (print_expression cond))));
+    etype_assert_assignable_to TBoolean condtype;
 
     let bodytype = type_of_expression gamma body in
     let elstype = type_of_expression gamma els in
@@ -60,17 +64,12 @@ let rec type_of_expression gamma expr = match expr with
   | Application (left, right) ->
     let leftT = type_of_expression gamma left in
     let rightT = type_of_expression gamma right in
-
-    (match leftT with
-    | TFunction _ | TParameter _ -> ()
-    | _ -> raise (Type_exn ("cannot apply " ^ (etype_print rightT) ^ " to " ^ (etype_print leftT))));
-
     etype_apply leftT rightT
   | Function (param, body, _) ->
-    let paramT = TParameter "T" in
+    let paramT = TName "T" in
     let new_gamma = dict_put param paramT gamma in
     let bodyT = type_of_expression new_gamma body in
-    TFunction (paramT, bodyT)
+    TForAll ("T", TFunction (paramT, bodyT))
   | _ -> raise (Type_exn ("unknown type mismatch: " ^ (print_expression expr)))
 ;;
 

@@ -14,7 +14,8 @@ type expression = Variable of string
 type etype = TBoolean
            | TNatural
            | TFunction of etype * etype
-           | TParameter of string
+           | TForAll of string * etype
+           | TName of string
            ;;
 
 let print_ctx_keys xs =
@@ -44,15 +45,25 @@ let rec etype_print = function
     (match a with
     | TFunction (_, _) -> "(" ^ (etype_print a) ^ ") -> " ^ (etype_print b)
     | _ -> (etype_print a) ^ " -> " ^ (etype_print b))
-  | TParameter t -> "[" ^ t ^ "]"
+  | TForAll (n, e) -> ("∀" ^ n ^ ". " ^ (etype_print e))
+  | TName t -> t
 ;;
 
 let rec etype_equal left right = match (left, right) with
   | (TBoolean, TBoolean) -> true
   | (TNatural, TNatural) -> true
-  | (TParameter a, TParameter b) -> String.equal a b
+  | (TName a, TName b) -> String.equal a b
+  | (TForAll (_, a), TForAll (_, b)) -> etype_equal a b
   | (TFunction (a, b), TFunction (c, d)) -> (etype_equal a c) && (etype_equal b d)
   | _ -> false
+;;
+
+let rec etype_replace t a b =
+  match t with
+  | TForAll (n, tt) when String.equal n a -> etype_replace tt a b
+  | TName n when String.equal n a -> b
+  | TFunction (TName n, tt) when String.equal n a -> TFunction (b, etype_replace tt a b)
+  | _ -> t
 ;;
 
 let debug_expression x =
