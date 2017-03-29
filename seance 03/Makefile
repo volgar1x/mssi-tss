@@ -7,7 +7,7 @@ OCAMLDEP=ocamldep
 OCAMLLEX=ocamllex
 OCAMLYACC=ocamlyacc
 
-APPLI_OBJS=maybe.cmo dict.cmo types.cmo parser.cmo lexer.cmo eval.cmo stdlib.cmo typechecker.cmo main.cmo
+APPLI_OBJS=maybe.cmo dict.cmo types.cmo parser.cmo lexer.cmo typechecker.cmo eval.cmo stdlib.cmo main.cmo
 
 $(TARGET): build
 

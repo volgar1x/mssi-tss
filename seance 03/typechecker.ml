@@ -9,6 +9,8 @@ type type_context = {
   context    : (string * etype) list;
 };;
 
+let empty_gamma = { next_param = "T"; context = [] };;
+
 let next_param param = Char.escaped (Char.chr ((Char.code param.[0]) + 1)) ;;
 
 let rec etype_is_assignable_to fromT toT =
@@ -59,7 +61,10 @@ let rec type_of_expression gamma expr = match expr with
   | Bind (varname, varexpr, body) ->
     let vartype = type_of_expression gamma varexpr in
     let new_gamma = dict_put varname vartype gamma.context in
-    type_of_expression { next_param = gamma.next_param; context = new_gamma } body
+    (match body with
+    | Unit -> vartype
+    | _ ->
+      type_of_expression { next_param = gamma.next_param; context = new_gamma } body)
 
   | Cond (cond, body, els) ->
     let condtype = type_of_expression gamma cond in

@@ -6,7 +6,7 @@ open Stdlib ;;
 open Typechecker ;;
 open Lexing ;;
 
-let rec loop ctx =
+let rec loop gamma ctx =
   let parse buf =
     try
       Parser.line Lexer.lexer buf
@@ -19,9 +19,9 @@ let rec loop ctx =
 
   let eval_print line =
     let expr = parse (Lexing.from_string line) in
-
     (* debug_expression expr; *)
-    let exprT = type_of_expression (type_of_context ctx) expr in  
+
+    let exprT = type_of_expression gamma expr in  
     print_endline ("=> " ^ (etype_print exprT));
     
     let (result, new_ctx) = eval expr ctx in
@@ -35,21 +35,21 @@ let rec loop ctx =
     if (String.length (String.trim line)) > 0 then
       let new_ctx = eval_print line in
       (* debug_ctx new_ctx; *)
-      loop new_ctx
+      loop gamma new_ctx
     else
-      loop ctx
+      loop gamma ctx
 
   with
   | End_of_file -> ()
   | Eval_exn msg ->
     print_string ("Error: " ^ msg ^ "\n");
-    loop ctx
+    loop gamma ctx
   | Type_exn msg ->
     print_string ("Type mismatch: " ^ msg ^ "\n");
-    loop ctx
+    loop gamma ctx
 ;;
 
-let stdlib = load_stdlib () in
-debug_gamma (type_of_context stdlib).context;
-loop stdlib
+let (stdlib_gamma, stdlib) = load_stdlib () in
+debug_gamma stdlib_gamma.context;
+loop stdlib_gamma stdlib
 ;;
