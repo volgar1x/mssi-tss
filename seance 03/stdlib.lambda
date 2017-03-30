@@ -1,8 +1,9 @@
 let id = lambda x. x ;;
 
-let and = lambda l. lambda r. if l then if r then true else false else false ;;
-let or  = lambda l. lambda r. if l then true else if r then true else false ;;
-let xor = lambda l. lambda r. if l then (if r then false else true) else (if r then true else false) ;;
+let not = lambda b. if b then false else true ;;
+let and = lambda l. lambda r. if l then r else false ;;
+let or  = lambda l. lambda r. if l then true else r ;;
+let xor = lambda l. lambda r. if l then (not r) else r ;;
 
 let nil = lambda c. lambda n. n ;;
 let cons = lambda h. lambda t. lambda c. lambda n. c h (t c n) ;;

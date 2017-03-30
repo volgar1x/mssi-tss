@@ -49,7 +49,13 @@ let rec loop gamma ctx =
     loop gamma ctx
 ;;
 
-let (stdlib_gamma, stdlib) = load_stdlib () in
-debug_gamma stdlib_gamma.context;
-loop stdlib_gamma stdlib
-;;
+(*try
+  let (stdlib_gamma, stdlib) = load_stdlib () in
+  debug_gamma stdlib_gamma.context;
+  loop stdlib_gamma stdlib
+with
+| Eval_exn msg ->
+  print_endline msg
+;;*)
+
+loop empty_gamma [] ;;

@@ -28,6 +28,8 @@ let load_stdlib () =
       raise (Eval_exn ("Parse Error on " ^ (string_of_int no) ^ ":" ^ (string_of_int buf.lex_curr_pos) ^ " `" ^ (lexeme buf) ^ "'"))
     | Failure reason ->
       raise (Eval_exn ("Parse Error at line " ^ (string_of_int no) ^ " `" ^ (lexeme buf) ^ "' because: " ^ reason))
+    | Type_exn reason ->
+      raise (Eval_exn ("Type Mismatch at line " ^ (string_of_int no) ^ " because: " ^ reason))
   in
 
   let rec aux gamma acc no =

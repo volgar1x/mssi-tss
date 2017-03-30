@@ -1,4 +1,5 @@
 open Dict ;;
+open Maybe ;;
 
 type expression = Variable of string
                 | Function of string * expression * ((string * expression) list)
@@ -17,6 +18,7 @@ type etype = TBoolean
            | TFunction of etype * etype
            | TForAll of string * etype
            | TName of string
+           | TParam of string
            ;;
 
 let print_ctx_keys xs =
@@ -49,6 +51,7 @@ let rec etype_print = function
     | _ -> (etype_print a) ^ " -> " ^ (etype_print b))
   | TForAll (n, e) -> ("∀" ^ n ^ ". " ^ (etype_print e))
   | TName t -> t
+  | TParam t -> "'" ^ t
 ;;
 
 let rec etype_equal left right = match (left, right) with
@@ -59,6 +62,14 @@ let rec etype_equal left right = match (left, right) with
   | (TForAll (_, a), TForAll (_, b)) -> etype_equal a b
   | (TFunction (a, b), TFunction (c, d)) -> (etype_equal a c) && (etype_equal b d)
   | _ -> false
+;;
+
+let etype_intersect a b =
+  if etype_equal a b then Just a else
+  match (a, b) with
+  | (TParam _, _) -> Just b
+  | (_, TParam _) -> Just a
+  | _ -> Nothing
 ;;
 
 let rec etype_replace t a b =
