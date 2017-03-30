@@ -1,10 +1,10 @@
 .PHONY: run build clean
 
 build:
-	ocamlbuild -use-ocamlfind 'main.native'
+	ocamlbuild -use-ocamlfind -pkgs 'batteries' 'main.native'
 
 run:
 	make build && ./main.native; make clean
 
 clean:
-	rm -rf _build
+	rm -rf _build 'main.native'
