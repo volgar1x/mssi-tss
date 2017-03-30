@@ -1,6 +1,2 @@
-/appli
-*.cmi
-*.cmo
-parser.ml
-parser.mli
-lexer.ml
+/_build
+/main.native
