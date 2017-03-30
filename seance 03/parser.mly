@@ -30,6 +30,7 @@ line :
 ;
 
 atom :
+    | Loparen Lcparen                     {Unit}
     | Lident                              {Variable ($1)}
     | Linteger                            {Natural (int_of_string $1)}
     | Ltrue                               {Boolean true}
